@@ -1,0 +1,7 @@
+age,income,gender,purchased
+25,50000,Male,1
+30,60000,Female,0
+,,Male,1
+35,,Female,0
+40,70000,Male,1
+50,80000,Female,0
