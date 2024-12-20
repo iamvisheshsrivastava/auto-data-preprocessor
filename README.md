@@ -105,18 +105,23 @@ The following customization options will soon be available:
 ## Directory Structure
 ```
 auto-data-preprocessor/
-├── auto_data_preprocessor/
+├── auto_preprocessor/
 │   ├── __init__.py           # Makes it a package
-│   ├── preprocess.py         # Core preprocessing logic
-│   ├── visualization.py      # Data visualization utilities
-│   ├── model_selection.py    # Model selection utilities
-│   ├── utils.py              # Utility/helper functions
+│   ├── data_cleaning.py      # Data cleaning utilities
+│   ├── data_preprocessor.py  # Core preprocessing logic
+│   ├── feature_engineering.py # Feature engineering utilities
+├── data/
+│   ├── sample_data.csv       # Example dataset
+├── examples/
+│   ├── usage_example.ipynb   # Jupyter Notebook with example usage
 ├── tests/
-│   ├── test_preprocess.py    # Unit tests for preprocessing
-│   ├── test_visualization.py # Unit tests for visualization
-├── example_usage.py          # Example script for users
-├── requirements.txt          # Dependency list
+│   ├── test_data_cleaning.py # Unit tests for data cleaning
+│   ├── test_data_preprocessor.py # Unit tests for data preprocessing
+│   ├── test_feature_engineering.py # Unit tests for feature engineering
+├── .gitignore                # Git ignore file
+├── LICENSE                   # Project license
 ├── README.md                 # Documentation
+├── requirements.txt          # Dependency list
 ├── setup.py                  # Package setup file
 ```
 
