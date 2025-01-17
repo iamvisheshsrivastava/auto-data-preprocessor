@@ -1,39 +1,118 @@
+[![Project Status: In Progress](https://img.shields.io/badge/Project%20Status-In%20Progress-blue.svg)](#)
+
 # auto-data-preprocessor
 
-## Overview
-`auto-data-preprocessor` is a Python library designed to simplify and automate data preprocessing tasks for classification problems using tabular data. It handles essential steps like data cleaning, missing value imputation, encoding, and feature scaling, making it easier for users to focus on building models and analyzing results. This library is suitable for both beginners and experienced data scientists who want to streamline their data preparation workflows.
+**auto-data-preprocessor** is a comprehensive Python library designed to automate the most common data preprocessing tasks for **classification** problems involving tabular data. It frees data scientists and machine learning practitioners from routine data cleaning and preparation chores, so they can focus on building models and interpreting their results.
+
+## Table of Contents
+
+1. [Overview](#overview)  
+2. [Key Features](#key-features)  
+3. [Why auto-data-preprocessor? (Comparison with Existing Market Solutions)](#why-auto-data-preprocessor)  
+4. [Installation](#installation)  
+5. [Quick Start Guide](#quick-start-guide)  
+6. [Detailed Usage Examples](#detailed-usage-examples)  
+7. [Directory Structure](#directory-structure)  
+8. [Roadmap and Future Enhancements](#roadmap-and-future-enhancements)  
+9. [Contributing](#contributing)  
+10. [License](#license)  
+11. [Contact](#contact)  
 
 ---
 
-## Features
-- **Data Cleaning:** Automatically identifies and handles missing values and outliers.
-- **Data Imputation:** Fills missing values using default strategies (e.g., mean imputation) or user-specified methods.
-- **Categorical Encoding:** Encodes categorical variables using Label Encoding or One-Hot Encoding.
-- **Feature Scaling:** Scales numerical features using StandardScaler (default) or other scaling options.
-- **Target Separation:** Automatically separates the target column for classification tasks.
-- **Ease of Use:** Allows users to customize preprocessing steps through simple arguments.
-- **Future Enhancements:** Automated EDA, outlier detection, class balancing, and lightweight model evaluation.
+## 1. Overview
+
+Real-world data is often messy. It may include missing values, outliers, mixed data types, and complex relationships. Before training a machine learning model, you need to clean, transform, and standardize your data to ensure robust, reliable results.
+
+**auto-data-preprocessor** aims to simplify and automate these tedious, yet essential, steps for **classification** tasks. It provides an easy-to-use interface to handle:
+
+- Missing value imputation  
+- Outlier detection (planned in the next updates)  
+- Categorical encoding  
+- Numerical feature scaling  
+- Basic feature engineering (such as polynomial features or transformations - planned)  
+
+This library is suitable for **both beginners and advanced data scientists** who want to **accelerate** their data preparation workflows.
 
 ---
 
-## Installation
+## 2. Key Features
 
-To install the library, use pip:
+1. **Automatic Missing Value Handling**  
+   - Identifies missing values in numerical and categorical columns.  
+   - Default imputation strategies (mean for numerical, most frequent for categorical) or **customizable** in upcoming versions.
+
+2. **Categorical Encoding**  
+   - **Label Encoding** by default.  
+   - Plan to allow **One-Hot Encoding** or other advanced encoders (e.g., target encoding) in the future.
+
+3. **Feature Scaling**  
+   - Uses **StandardScaler** by default (mean=0, variance=1).  
+   - Future enhancements include **MinMaxScaler**, **RobustScaler**, or **custom scalers**.
+
+4. **Target Separation for Classification**  
+   - Automatically separates the target column from the dataset, simplifying the modeling pipeline.
+
+5. **Outlier Detection (Planned)**  
+   - Will provide automated detection and handling using techniques like **IQR**, **z-score**, or **Isolation Forest**.
+
+6. **Basic Feature Engineering (Planned)**  
+   - Transformations like logarithmic scaling, polynomial features, and feature interactions.
+
+7. **Customization Options**  
+   - Upcoming versions will allow specifying advanced imputation methods, encoder types, and scaling techniques.
+
+8. **Ease of Use**  
+   - Designed to be **beginner-friendly** yet **highly flexible** for experienced users.  
+   - Simple function calls for straightforward workflows.
+
+---
+
+## 3. Why auto-data-preprocessor? (Comparison with Existing Market Solutions)
+
+Many libraries in the Python ecosystem address data preprocessing. For example:
+
+- **scikit-learn**: Provides transformers (e.g., `SimpleImputer`, `StandardScaler`, `LabelEncoder`) but requires you to chain multiple objects in a pipeline manually.  
+- **Feature-engine**: Offers specialized transformers for encoding, outlier handling, and more, but may require more granular configuration.  
+- **Pandas**: Very flexible for manual preprocessing but involves a lot of repetitive coding if you’re always performing the same steps.  
+
+**auto-data-preprocessor** combines several commonly used steps into a **single, unified, high-level interface**, aiming to reduce boilerplate code. While it doesn’t fully replace the customizability of scikit-learn pipelines or advanced libraries for specialized tasks, it provides a **“plug-and-play”** solution for most classification workflows.
+
+**Key Differentiators**:
+
+1. **Simplicity**: Single function (`preprocess`) to handle multiple preprocessing tasks at once.  
+2. **Automation**: Detects and handles many data issues automatically.  
+3. **Extendibility**: Designed with modularity in mind, so future additions or community contributions can seamlessly extend functionalities.
+
+---
+
+## 4. Installation
+
+The package is hosted on PyPI. You can install it using:
 
 ```bash
 pip install auto-data-preprocessor
 ```
 
+Alternatively, clone this repository and install with:
+
+```bash
+git clone https://github.com/iamvisheshsrivastava/auto-data-preprocessor.git
+cd auto-data-preprocessor
+pip install .
+```
+
 ---
 
-## Quick Start Guide
+## 5. Quick Start Guide
 
-### Example Usage
+Here’s a minimal example to show how easy it is to get started:
+
 ```python
 import pandas as pd
 from auto_data_preprocessor import AutoDataPreprocessor
 
-# Sample data
+# Sample dataset
 data = {
     "age": [25, 30, None, 35],
     "income": [50000, 60000, 70000, None],
@@ -49,18 +128,18 @@ preprocessor = AutoDataPreprocessor()
 # Preprocess the data
 X, y = preprocessor.preprocess(df, target_column="purchased")
 
-# Output results
 print("Processed Features:")
 print(X)
 
-print("Target Column:")
+print("\nTarget Column:")
 print(y)
 ```
 
-#### Output:
-```plaintext
+**Output Example**:
+
+```
 Processed Features:
-          age    income  gender
+         age    income  gender
 0  -1.224745 -1.224745       1
 1   0.000000  0.000000       0
 2   1.224745  1.224745       1
@@ -75,104 +154,157 @@ Target Column:
 
 ---
 
-## Customization Options (Planned Enhancements)
+## 6. Detailed Usage Examples
 
-The following customization options will soon be available:
+Below are additional examples demonstrating how you might integrate **auto-data-preprocessor** into a typical data science workflow.
 
-1. **Missing Value Imputation:**
-   - Specify strategies such as `mean`, `median`, `mode`, or custom values.
+### 6.1 Using Custom Target Column
 
-2. **Categorical Encoding:**
-   - Choose between `Label Encoding` and `One-Hot Encoding`.
+Sometimes your dataset has a different target column name, such as `y` or `Class`. Just specify it:
 
-3. **Scaling Methods:**
-   - Use alternative scalers such as `MinMaxScaler` or `RobustScaler`.
+```python
+df = pd.read_csv("path_to_csv.csv")  # your custom dataset
 
-4. **Outlier Detection and Handling:**
-   - Automated detection using IQR, z-score, or Isolation Forest.
+preprocessor = AutoDataPreprocessor()
+X, y = preprocessor.preprocess(df, target_column="Class")
+```
 
-5. **Class Balancing:**
-   - Implement resampling techniques like `SMOTE`, `RandomOverSampler`, and `RandomUnderSampler`.
+### 6.2 Integrating with scikit-learn Models
 
-6. **Data Visualization:**
-   - Include EDA tools for data distribution insights, histograms, and correlation heatmaps.
+Once your features `X` and target `y` are processed, you can directly feed them into any scikit-learn estimator:
 
-7. **Pipeline Export:**
-   - Save preprocessing pipelines using `joblib` or `pickle` for reuse.
+```python
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
+
+# Suppose X, y are obtained from the preprocessor
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+model = RandomForestClassifier()
+model.fit(X_train, y_train)
+accuracy = model.score(X_test, y_test)
+
+print(f"Test Accuracy: {accuracy}")
+```
+
+### 6.3 Handling Missing Values (Planned Customization)
+
+The default strategy is **mean imputation for numerical** and **most frequent for categorical** columns. In future releases, you’ll be able to specify:
+
+```python
+preprocessor = AutoDataPreprocessor(
+    numerical_imputation_strategy='median',
+    categorical_imputation_strategy='mode',
+    fill_values={'age': 30, 'income': 50000}  # custom fill values
+)
+```
 
 ---
 
-## Directory Structure
-```
+## 7. Directory Structure
+
+```plaintext
 auto-data-preprocessor/
 ├── auto_preprocessor/
-│   ├── __init__.py           # Makes it a package
-│   ├── data_cleaning.py      # Data cleaning utilities
-│   ├── data_preprocessor.py  # Core preprocessing logic
-│   ├── feature_engineering.py # Feature engineering utilities
+│   ├── __init__.py               # Package entry point
+│   ├── data_cleaning.py          # Data cleaning utilities
+│   ├── data_preprocessor.py      # Core preprocessing logic
+│   └── feature_engineering.py    # Feature engineering utilities
 ├── data/
-│   ├── sample_data.csv       # Example dataset
+│   └── sample_data.csv           # Example dataset
 ├── examples/
-│   ├── usage_example.ipynb   # Jupyter Notebook with example usage
+│   └── usage_example.ipynb       # Jupyter Notebook with example usage
 ├── tests/
-│   ├── test_data_cleaning.py # Unit tests for data cleaning
+│   ├── test_data_cleaning.py     # Unit tests for data cleaning
 │   ├── test_data_preprocessor.py # Unit tests for data preprocessing
-│   ├── test_feature_engineering.py # Unit tests for feature engineering
-├── .gitignore                # Git ignore file
-├── LICENSE                   # Project license
-├── README.md                 # Documentation
-├── requirements.txt          # Dependency list
-├── setup.py                  # Package setup file
+│   └── test_feature_engineering.py # Unit tests for feature engineering
+├── .gitignore                    # Files and folders to ignore in Git
+├── LICENSE                       # MIT License file
+├── README.md                     # Documentation
+├── requirements.txt              # Dependency list
+└── setup.py                      # Package setup configuration
 ```
 
 ---
 
-## Future Enhancements
+## 8. Roadmap and Future Enhancements
 
-Here is a roadmap for planned features:
+Here’s what we’re working on next:
 
-1. **Automated Exploratory Data Analysis (EDA):**
-   - Generate basic insights and visualizations for numerical and categorical variables.
+1. **Automated Exploratory Data Analysis (EDA)**  
+   - Generate summary statistics, distributions, and correlation heatmaps.
 
-2. **Feature Engineering:**
-   - Include transformations like polynomial features, logarithmic scaling, and interaction terms.
+2. **Advanced Outlier Detection**  
+   - Implement IQR-based outlier removal, z-score, or advanced methods like Isolation Forest.
 
-3. **Explainability:**
-   - Provide insights into preprocessing effects and feature importance.
+3. **Enhanced Categorical Encoding**  
+   - One-Hot Encoding, Target Encoding, and more advanced strategies.
 
-4. **Interactive Dashboards:**
-   - Develop interactive EDA dashboards using `Dash` or `Streamlit`.
+4. **Customizable Scaling**  
+   - Options for MinMaxScaler, RobustScaler, and user-defined transformations.
 
-5. **Basic Model Evaluation:**
-   - Include lightweight model evaluation tools for baseline comparisons.
+5. **Feature Engineering**  
+   - Transformations like polynomial features, logarithmic scaling, interaction terms.
 
----
+6. **Model Evaluation**  
+   - Integrate baseline model evaluations (e.g., a quick random forest or logistic regression) to check data readiness.
 
-## Contribution Guidelines
+7. **Pipeline Export**  
+   - Ability to save and load the preprocessing pipeline (joblib/pickle).
 
-We welcome contributions! To contribute:
-
-1. Fork the repository.
-2. Create a feature branch.
-3. Commit your changes with clear messages.
-4. Push your branch and create a pull request.
-
-Please ensure all new features are covered by unit tests and documented.
+8. **Interactive Dashboards**  
+   - Use Streamlit or Dash for interactive EDA and data cleaning insights.
 
 ---
 
-## License
+## 9. Contributing
 
-This project is licensed under the MIT License. See the `LICENSE` file for details.
+We **welcome contributions** from the community! Here’s how you can get involved:
+
+1. **Fork the Repository**  
+   - Click the “Fork” button in GitHub to create a personal copy of the repo.
+
+2. **Create a Feature Branch**  
+   - Use a descriptive name for your branch: `git checkout -b feature/improved-encoding`.
+
+3. **Commit Your Changes**  
+   - Write clear and concise commit messages: `git commit -m "Add MinMaxScaler option"`.
+
+4. **Push Your Branch**  
+   - `git push origin feature/improved-encoding`.
+
+5. **Create a Pull Request**  
+   - Compare your feature branch to the main repository’s `main` branch.  
+   - Include details about what you changed and why.
+
+**Guidelines**:
+
+- Ensure that you include or update **unit tests** for any new functionality.  
+- Provide relevant **documentation** or **docstrings**.  
+- Follow Python’s PEP8 style guidelines for clean and readable code.
 
 ---
 
-## Contact
+## 10. License
 
-For questions or suggestions, please reach out:
+This project is licensed under the **MIT License**. You are free to use, modify, and distribute this software in compliance with the license terms. For more details, see the [LICENSE](LICENSE) file.
 
-- **Author:** Vishesh Srivastava
-- **Email:** srivastava.vishesh9@gmail.com
-- **GitHub:** [iamvisheshsrivastava](https://github.com/iamvisheshsrivastava)
-- **Portfolio:** [visheshsrivastava.com](https://visheshsrivastava.com)
+---
 
+## 11. Contact
+
+For questions, suggestions, or feedback, feel free to reach out:
+
+- **Author**: [Vishesh Srivastava](https://github.com/iamvisheshsrivastava)  
+- **Email**: <srivastava.vishesh9@gmail.com>  
+- **GitHub**: [iamvisheshsrivastava](https://github.com/iamvisheshsrivastava)  
+- **Portfolio**: [visheshsrivastava.com](https://visheshsrivastava.com)
+
+---
+
+**Happy Preprocessing!**  
+We hope **auto-data-preprocessor** streamlines your classification workflows and saves you valuable time and effort.
+
+---
+
+*If you find this project helpful, consider giving a star and sharing it with the community.*
