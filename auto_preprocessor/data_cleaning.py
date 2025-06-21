@@ -27,3 +27,7 @@ def handle_missing_values(df, strategy="mean", columns=None):
         for column in columns:
             df[column] = df[column].fillna(df[column].mode()[0])
     return df
+
+def remove_duplicate_rows(df):
+    """Remove duplicate rows from a DataFrame and reset index."""
+    return df.drop_duplicates().reset_index(drop=True)
