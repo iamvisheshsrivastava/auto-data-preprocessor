@@ -302,9 +302,4 @@ For questions, suggestions, or feedback, feel free to reach out:
 
 ---
 
-**Happy Preprocessing!**  
-We hope **auto-data-preprocessor** streamlines your classification workflows and saves you valuable time and effort.
-
----
-
 *If you find this project helpful, consider giving a star and sharing it with the community.*
