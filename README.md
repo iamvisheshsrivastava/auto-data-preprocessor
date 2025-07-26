@@ -42,9 +42,9 @@ This library is suitable for **both beginners and advanced data scientists** who
    - Identifies missing values in numerical and categorical columns.  
    - Default imputation strategies (mean for numerical, most frequent for categorical) or **customizable** in upcoming versions.
 
-2. **Categorical Encoding**  
-   - **Label Encoding** by default.  
-   - Plan to allow **One-Hot Encoding** or other advanced encoders (e.g., target encoding) in the future.
+2. **Categorical Encoding**
+   - **Label Encoding** by default.
+   - Optional **One-Hot Encoding** via `encoding_strategy="onehot"`.
 
 3. **Feature Scaling**  
    - Uses **StandardScaler** by default (mean=0, variance=1).  
@@ -237,8 +237,8 @@ Here’s what we’re working on next:
 2. **Advanced Outlier Detection**  
    - Implement IQR-based outlier removal, z-score, or advanced methods like Isolation Forest.
 
-3. **Enhanced Categorical Encoding**  
-   - One-Hot Encoding, Target Encoding, and more advanced strategies.
+3. **Enhanced Categorical Encoding**
+   - One-Hot Encoding implemented. Target Encoding and more advanced strategies are planned.
 
 4. **Customizable Scaling**  
    - Options for MinMaxScaler, RobustScaler, and user-defined transformations.
