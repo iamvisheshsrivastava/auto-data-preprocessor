@@ -1,5 +1,5 @@
 import pandas as pd
-from sklearn.preprocessing import StandardScaler, LabelEncoder
+from sklearn.preprocessing import StandardScaler, LabelEncoder, OneHotEncoder
 from sklearn.impute import SimpleImputer
 
 
@@ -17,7 +17,8 @@ class DataPreprocessor:
 
     def __init__(self,
                  numerical_imputer_strategy="mean",
-                 categorical_imputer_strategy="most_frequent"):
+                 categorical_imputer_strategy="most_frequent",
+                 encoding_strategy="label"):
         """
         Initializes the preprocessing pipeline.
 
@@ -26,9 +27,15 @@ class DataPreprocessor:
               Strategy for imputing missing values in numerical columns.
         - categorical_imputer_strategy: str, default="most_frequent"
               Strategy for imputing missing values in categorical columns.
+        - encoding_strategy: str, default="label"
+              Encoding method for categorical variables. Supported values are
+              "label" and "onehot".
         """
+        self.encoding_strategy = encoding_strategy
+
         self.scaler = StandardScaler()
         self.label_encoders = {}
+        self.onehot_encoder = None
         self.num_imputer = SimpleImputer(strategy=numerical_imputer_strategy)
         self.cat_imputer = SimpleImputer(strategy=categorical_imputer_strategy)
 
@@ -59,6 +66,10 @@ class DataPreprocessor:
         categorical_columns = X.select_dtypes(include=["object", "category"]).columns.tolist()
         numerical_columns = X.select_dtypes(include=["number"]).columns.tolist()
 
+        # store columns for later transformations
+        self.categorical_columns = categorical_columns
+        self.numerical_columns = numerical_columns
+
         # 3. Handle missing values
         if numerical_columns:
             X[numerical_columns] = self.num_imputer.fit_transform(X[numerical_columns])
@@ -66,10 +77,19 @@ class DataPreprocessor:
             X[categorical_columns] = self.cat_imputer.fit_transform(X[categorical_columns])
 
         # 4. Encode categorical variables
-        for column in categorical_columns:
-            le = LabelEncoder()
-            X[column] = le.fit_transform(X[column].astype(str))
-            self.label_encoders[column] = le
+        if categorical_columns:
+            if self.encoding_strategy == "label":
+                for column in categorical_columns:
+                    le = LabelEncoder()
+                    X[column] = le.fit_transform(X[column].astype(str))
+                    self.label_encoders[column] = le
+            elif self.encoding_strategy == "onehot":
+                self.onehot_encoder = OneHotEncoder(handle_unknown="ignore", sparse=False)
+                onehot_array = self.onehot_encoder.fit_transform(X[categorical_columns])
+                new_cols = self.onehot_encoder.get_feature_names_out(categorical_columns)
+                onehot_df = pd.DataFrame(onehot_array, columns=new_cols, index=X.index)
+                X = X.drop(columns=categorical_columns)
+                X = pd.concat([X, onehot_df], axis=1)
 
         # 5. Scale numerical features
         if numerical_columns:
@@ -92,17 +112,24 @@ class DataPreprocessor:
         """
         df = df.copy()
 
-        categorical_columns = df.select_dtypes(include=["object", "category"]).columns.tolist()
-        numerical_columns = df.select_dtypes(include=["number"]).columns.tolist()
+        categorical_columns = self.categorical_columns
+        numerical_columns = self.numerical_columns
 
         if numerical_columns:
             df[numerical_columns] = self.num_imputer.transform(df[numerical_columns])
 
         if categorical_columns:
             df[categorical_columns] = self.cat_imputer.transform(df[categorical_columns])
-            for column in categorical_columns:
-                if column in self.label_encoders:
-                    df[column] = self.label_encoders[column].transform(df[column].astype(str))
+            if self.encoding_strategy == "label":
+                for column in categorical_columns:
+                    if column in self.label_encoders:
+                        df[column] = self.label_encoders[column].transform(df[column].astype(str))
+            elif self.encoding_strategy == "onehot" and self.onehot_encoder is not None:
+                onehot_array = self.onehot_encoder.transform(df[categorical_columns])
+                new_cols = self.onehot_encoder.get_feature_names_out(categorical_columns)
+                onehot_df = pd.DataFrame(onehot_array, columns=new_cols, index=df.index)
+                df = df.drop(columns=categorical_columns)
+                df = pd.concat([df, onehot_df], axis=1)
 
         if numerical_columns:
             df[numerical_columns] = self.scaler.transform(df[numerical_columns])
