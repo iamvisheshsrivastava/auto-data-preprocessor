@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from sklearn.preprocessing import MinMaxScaler
 
 def remove_outliers(df, columns, method="zscore", threshold=3):
     if method == "zscore":
@@ -31,3 +32,28 @@ def handle_missing_values(df, strategy="mean", columns=None):
 def remove_duplicate_rows(df):
     """Remove duplicate rows from a DataFrame and reset index."""
     return df.drop_duplicates().reset_index(drop=True)
+
+
+def normalize_columns(df, columns=None):
+    """Normalize selected numeric columns to the range [0, 1].
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Input DataFrame whose columns will be normalized.
+    columns : list of str, optional
+        Specific column names to normalize. If ``None`` (default), all numeric
+        columns are normalized.
+
+    Returns
+    -------
+    pandas.DataFrame
+        DataFrame with normalized columns.
+    """
+
+    if columns is None:
+        columns = df.select_dtypes(include=["number"]).columns
+
+    scaler = MinMaxScaler()
+    df[columns] = scaler.fit_transform(df[columns])
+    return df

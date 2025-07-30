@@ -1,5 +1,5 @@
 import pandas as pd
-from sklearn.preprocessing import StandardScaler, LabelEncoder, OneHotEncoder
+from sklearn.preprocessing import StandardScaler, MinMaxScaler, LabelEncoder, OneHotEncoder
 from sklearn.impute import SimpleImputer
 
 
@@ -11,14 +11,15 @@ class DataPreprocessor:
     - Automatic detection of categorical and numerical columns
     - Missing value imputation (default strategies)
     - Label encoding for categorical variables
-    - Standard scaling for numerical features
+    - Feature scaling for numerical columns (standard or min-max)
     - Target column separation
     """
 
     def __init__(self,
                  numerical_imputer_strategy="mean",
                  categorical_imputer_strategy="most_frequent",
-                 encoding_strategy="label"):
+                 encoding_strategy="label",
+                 scaling_strategy="standard"):
         """
         Initializes the preprocessing pipeline.
 
@@ -30,10 +31,17 @@ class DataPreprocessor:
         - encoding_strategy: str, default="label"
               Encoding method for categorical variables. Supported values are
               "label" and "onehot".
+        - scaling_strategy: str, default="standard"
+              Scaling method for numerical features. Supported values are
+              "standard" and "minmax".
         """
         self.encoding_strategy = encoding_strategy
 
-        self.scaler = StandardScaler()
+        self.scaling_strategy = scaling_strategy
+        if scaling_strategy == "minmax":
+            self.scaler = MinMaxScaler()
+        else:
+            self.scaler = StandardScaler()
         self.label_encoders = {}
         self.onehot_encoder = None
         self.num_imputer = SimpleImputer(strategy=numerical_imputer_strategy)
