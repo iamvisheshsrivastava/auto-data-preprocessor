@@ -48,23 +48,25 @@ This library is suitable for **both beginners and advanced data scientists** who
    - **Label Encoding** by default.
    - Optional **One-Hot Encoding** via `encoding_strategy="onehot"`.
 
-3. **Feature Scaling**  
-   - Uses **StandardScaler** by default (mean=0, variance=1).  
-   - Future enhancements include **MinMaxScaler**, **RobustScaler**, or **custom scalers**.
+3. **Feature Scaling**
+   - Uses **StandardScaler** by default (mean=0, variance=1).
+   - Optionally switch to **MinMaxScaler** via `scaling_strategy="minmax"`.
 
-4. **Target Separation for Classification**  
+4. **Target Separation for Classification**
    - Automatically separates the target column from the dataset, simplifying the modeling pipeline.
 
-5. **Outlier Detection (Planned)**  
+5. **Column Normalization Utility**
+   - Quickly scale numeric columns to the `[0, 1]` range with `normalize_columns()`.
+6. **Outlier Detection (Planned)**
    - Will provide automated detection and handling using techniques like **IQR**, **z-score**, or **Isolation Forest**.
 
-6. **Basic Feature Engineering (Planned)**  
+7. **Basic Feature Engineering (Planned)**
    - Transformations like logarithmic scaling, polynomial features, and feature interactions.
 
-7. **Customization Options**  
+8. **Customization Options**
    - Upcoming versions will allow specifying advanced imputation methods, encoder types, and scaling techniques.
 
-8. **Ease of Use**  
+9. **Ease of Use**
    - Designed to be **beginner-friendly** yet **highly flexible** for experienced users.  
    - Simple function calls for straightforward workflows.
 
@@ -112,7 +114,7 @@ Here’s a minimal example to show how easy it is to get started:
 
 ```python
 import pandas as pd
-from auto_data_preprocessor import AutoDataPreprocessor
+from auto_preprocessor import DataPreprocessor
 
 # Sample dataset
 data = {
@@ -125,7 +127,7 @@ data = {
 df = pd.DataFrame(data)
 
 # Initialize the preprocessor
-preprocessor = AutoDataPreprocessor()
+preprocessor = DataPreprocessor(scaling_strategy="minmax")
 
 # Preprocess the data
 X, y = preprocessor.preprocess(df, target_column="purchased")
@@ -167,7 +169,7 @@ Sometimes your dataset has a different target column name, such as `y` or `Class
 ```python
 df = pd.read_csv("path_to_csv.csv")  # your custom dataset
 
-preprocessor = AutoDataPreprocessor()
+preprocessor = DataPreprocessor()
 X, y = preprocessor.preprocess(df, target_column="Class")
 ```
 
@@ -194,7 +196,7 @@ print(f"Test Accuracy: {accuracy}")
 The default strategy is **mean imputation for numerical** and **most frequent for categorical** columns. In future releases, you’ll be able to specify:
 
 ```python
-preprocessor = AutoDataPreprocessor(
+preprocessor = DataPreprocessor(
     numerical_imputation_strategy='median',
     categorical_imputation_strategy='mode',
     fill_values={'age': 30, 'income': 50000}  # custom fill values
