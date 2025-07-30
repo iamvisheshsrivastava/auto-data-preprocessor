@@ -4,6 +4,8 @@
 
 **auto-data-preprocessor** is a comprehensive Python library designed to automate the most common data preprocessing tasks for **classification** problems involving tabular data. It frees data scientists and machine learning practitioners from routine data cleaning and preparation chores, so they can focus on building models and interpreting their results.
 
+This tool integrates easily with existing scikit-learn pipelines, making it a convenient drop-in solution for many projects.
+
 ## Table of Contents
 
 1. [Overview](#overview)  
