@@ -1,5 +1,5 @@
 import pandas as pd
-from sklearn.preprocessing import StandardScaler, LabelEncoder, OneHotEncoder
+from sklearn.preprocessing import StandardScaler, MinMaxScaler, LabelEncoder, OneHotEncoder
 from sklearn.impute import SimpleImputer
 
 
@@ -18,7 +18,9 @@ class DataPreprocessor:
     def __init__(self,
                  numerical_imputer_strategy="mean",
                  categorical_imputer_strategy="most_frequent",
-                 encoding_strategy="label"):
+                 encoding_strategy="label",
+                 scaling_strategy="standard",
+                 missing_threshold=None):
         """
         Initializes the preprocessing pipeline.
 
@@ -30,14 +32,28 @@ class DataPreprocessor:
         - encoding_strategy: str, default="label"
               Encoding method for categorical variables. Supported values are
               "label" and "onehot".
+        - scaling_strategy: str, default="standard"
+              Scaling method for numerical features. Supported values are
+              "standard" and "minmax".
+        - missing_threshold: float or None
+              If set, drop columns with a fraction of missing values higher than
+              this threshold before further processing.
         """
         self.encoding_strategy = encoding_strategy
 
-        self.scaler = StandardScaler()
+        if scaling_strategy == "standard":
+            self.scaler = StandardScaler()
+        elif scaling_strategy == "minmax":
+            self.scaler = MinMaxScaler()
+        else:
+            raise ValueError("scaling_strategy must be 'standard' or 'minmax'")
+        self.scaling_strategy = scaling_strategy
+        self.missing_threshold = missing_threshold
         self.label_encoders = {}
         self.onehot_encoder = None
         self.num_imputer = SimpleImputer(strategy=numerical_imputer_strategy)
         self.cat_imputer = SimpleImputer(strategy=categorical_imputer_strategy)
+        self.dropped_columns = []
 
     def preprocess(self, df: pd.DataFrame, target_column: str):
         """
@@ -70,6 +86,16 @@ class DataPreprocessor:
         self.categorical_columns = categorical_columns
         self.numerical_columns = numerical_columns
 
+        if self.missing_threshold is not None:
+            missing_ratio = X.isna().mean()
+            drop_cols = missing_ratio[missing_ratio > self.missing_threshold].index
+            X = X.drop(columns=drop_cols)
+            categorical_columns = [c for c in categorical_columns if c not in drop_cols]
+            numerical_columns = [c for c in numerical_columns if c not in drop_cols]
+            self.categorical_columns = categorical_columns
+            self.numerical_columns = numerical_columns
+            self.dropped_columns = list(drop_cols)
+
         # 3. Handle missing values
         if numerical_columns:
             X[numerical_columns] = self.num_imputer.fit_transform(X[numerical_columns])
@@ -84,7 +110,11 @@ class DataPreprocessor:
                     X[column] = le.fit_transform(X[column].astype(str))
                     self.label_encoders[column] = le
             elif self.encoding_strategy == "onehot":
-                self.onehot_encoder = OneHotEncoder(handle_unknown="ignore", sparse=False)
+                try:
+                    self.onehot_encoder = OneHotEncoder(handle_unknown="ignore", sparse=False)
+                except TypeError:
+                    # for newer versions of scikit-learn
+                    self.onehot_encoder = OneHotEncoder(handle_unknown="ignore", sparse_output=False)
                 onehot_array = self.onehot_encoder.fit_transform(X[categorical_columns])
                 new_cols = self.onehot_encoder.get_feature_names_out(categorical_columns)
                 onehot_df = pd.DataFrame(onehot_array, columns=new_cols, index=X.index)
@@ -111,6 +141,9 @@ class DataPreprocessor:
               Transformed feature set.
         """
         df = df.copy()
+
+        if self.dropped_columns:
+            df = df.drop(columns=[c for c in self.dropped_columns if c in df.columns])
 
         categorical_columns = self.categorical_columns
         numerical_columns = self.numerical_columns
