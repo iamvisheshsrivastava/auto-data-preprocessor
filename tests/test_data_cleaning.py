@@ -1,6 +1,10 @@
 import pandas as pd
-from auto_preprocessor.data_cleaning import remove_outliers, handle_missing_values
-from auto_preprocessor.data_cleaning import remove_duplicate_rows
+from auto_preprocessor.data_cleaning import (
+    remove_outliers,
+    handle_missing_values,
+    remove_duplicate_rows,
+    standardize_column_names,
+)
 
 def test_remove_outliers():
     data = {
@@ -28,3 +32,10 @@ def test_remove_duplicate_rows():
     df = pd.DataFrame(data)
     deduped_df = remove_duplicate_rows(df)
     assert len(deduped_df) == 2
+
+def test_standardize_column_names():
+    data = {"A B": [1, 2], "C D": [3, 4]}
+    df = pd.DataFrame(data)
+    cleaned_df = standardize_column_names(df)
+    assert "a_b" in cleaned_df.columns
+    assert "c_d" in cleaned_df.columns

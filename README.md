@@ -47,10 +47,11 @@ This library is suitable for **both beginners and advanced data scientists** who
 2. **Categorical Encoding**
    - **Label Encoding** by default.
    - Optional **One-Hot Encoding** via `encoding_strategy="onehot"`.
+   - **Ordinal Encoding** via `encoding_strategy="ordinal"`.
 
-3. **Feature Scaling**  
-   - Uses **StandardScaler** by default (mean=0, variance=1).  
-   - Future enhancements include **MinMaxScaler**, **RobustScaler**, or **custom scalers**.
+3. **Feature Scaling**
+   - Uses **StandardScaler** by default (mean=0, variance=1).
+   - Supports **MinMaxScaler** via `scaling_strategy="minmax"`.
 
 4. **Target Separation for Classification**  
    - Automatically separates the target column from the dataset, simplifying the modeling pipeline.
@@ -58,8 +59,8 @@ This library is suitable for **both beginners and advanced data scientists** who
 5. **Outlier Detection (Planned)**  
    - Will provide automated detection and handling using techniques like **IQR**, **z-score**, or **Isolation Forest**.
 
-6. **Basic Feature Engineering (Planned)**  
-   - Transformations like logarithmic scaling, polynomial features, and feature interactions.
+6. **Basic Feature Engineering**
+   - Includes **Principal Component Analysis (PCA)** and generation of **polynomial features**.
 
 7. **Customization Options**  
    - Upcoming versions will allow specifying advanced imputation methods, encoder types, and scaling techniques.

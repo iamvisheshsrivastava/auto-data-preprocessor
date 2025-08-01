@@ -1,5 +1,6 @@
 import pandas as pd
-from sklearn.preprocessing import StandardScaler, LabelEncoder, OneHotEncoder
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
+from sklearn.preprocessing import LabelEncoder, OneHotEncoder, OrdinalEncoder
 from sklearn.impute import SimpleImputer
 
 
@@ -10,15 +11,16 @@ class DataPreprocessor:
     Features:
     - Automatic detection of categorical and numerical columns
     - Missing value imputation (default strategies)
-    - Label encoding for categorical variables
-    - Standard scaling for numerical features
+    - Multiple encoding options for categorical variables (label, onehot, ordinal)
+    - Configurable scaling for numerical features (standard or min-max)
     - Target column separation
     """
 
     def __init__(self,
                  numerical_imputer_strategy="mean",
                  categorical_imputer_strategy="most_frequent",
-                 encoding_strategy="label"):
+                 encoding_strategy="label",
+                 scaling_strategy="standard"):
         """
         Initializes the preprocessing pipeline.
 
@@ -29,13 +31,23 @@ class DataPreprocessor:
               Strategy for imputing missing values in categorical columns.
         - encoding_strategy: str, default="label"
               Encoding method for categorical variables. Supported values are
-              "label" and "onehot".
+              "label", "onehot", and "ordinal".
+        - scaling_strategy: str, default="standard"
+              Strategy for scaling numerical features. Supported values are
+              "standard" and "minmax".
         """
         self.encoding_strategy = encoding_strategy
+        self.scaling_strategy = scaling_strategy
 
-        self.scaler = StandardScaler()
+        if self.scaling_strategy == "standard":
+            self.scaler = StandardScaler()
+        elif self.scaling_strategy == "minmax":
+            self.scaler = MinMaxScaler()
+        else:
+            raise ValueError("Unsupported scaling strategy")
         self.label_encoders = {}
         self.onehot_encoder = None
+        self.ordinal_encoder = None
         self.num_imputer = SimpleImputer(strategy=numerical_imputer_strategy)
         self.cat_imputer = SimpleImputer(strategy=categorical_imputer_strategy)
 
@@ -84,12 +96,15 @@ class DataPreprocessor:
                     X[column] = le.fit_transform(X[column].astype(str))
                     self.label_encoders[column] = le
             elif self.encoding_strategy == "onehot":
-                self.onehot_encoder = OneHotEncoder(handle_unknown="ignore", sparse=False)
+                self.onehot_encoder = OneHotEncoder(handle_unknown="ignore", sparse_output=False)
                 onehot_array = self.onehot_encoder.fit_transform(X[categorical_columns])
                 new_cols = self.onehot_encoder.get_feature_names_out(categorical_columns)
                 onehot_df = pd.DataFrame(onehot_array, columns=new_cols, index=X.index)
                 X = X.drop(columns=categorical_columns)
                 X = pd.concat([X, onehot_df], axis=1)
+            elif self.encoding_strategy == "ordinal":
+                self.ordinal_encoder = OrdinalEncoder()
+                X[categorical_columns] = self.ordinal_encoder.fit_transform(X[categorical_columns].astype(str))
 
         # 5. Scale numerical features
         if numerical_columns:
@@ -130,6 +145,8 @@ class DataPreprocessor:
                 onehot_df = pd.DataFrame(onehot_array, columns=new_cols, index=df.index)
                 df = df.drop(columns=categorical_columns)
                 df = pd.concat([df, onehot_df], axis=1)
+            elif self.encoding_strategy == "ordinal" and self.ordinal_encoder is not None:
+                df[categorical_columns] = self.ordinal_encoder.transform(df[categorical_columns].astype(str))
 
         if numerical_columns:
             df[numerical_columns] = self.scaler.transform(df[numerical_columns])

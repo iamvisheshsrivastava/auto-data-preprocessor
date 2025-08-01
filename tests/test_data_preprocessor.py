@@ -26,3 +26,29 @@ def test_preprocess_onehot_encoding():
     X, y = preprocessor.preprocess(df, target_column="purchased")
     assert "gender_Female" in X.columns
     assert "gender_Male" in X.columns
+
+def test_preprocess_minmax_scaling():
+    data = {
+        "age": [10, 20],
+        "income": [1000, 2000],
+        "gender": ["M", "F"],
+        "purchased": [0, 1]
+    }
+    df = pd.DataFrame(data)
+    preprocessor = DataPreprocessor(scaling_strategy="minmax")
+    X, _ = preprocessor.preprocess(df, target_column="purchased")
+    assert X["age"].min() == 0
+    assert X["age"].max() == 1
+
+
+def test_preprocess_ordinal_encoding():
+    data = {
+        "age": [25, 30],
+        "income": [50000, 60000],
+        "gender": ["Male", "Female"],
+        "purchased": [1, 0]
+    }
+    df = pd.DataFrame(data)
+    preprocessor = DataPreprocessor(encoding_strategy="ordinal")
+    X, _ = preprocessor.preprocess(df, target_column="purchased")
+    assert X["gender"].dtype.kind in "if"
