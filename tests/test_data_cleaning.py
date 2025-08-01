@@ -1,6 +1,10 @@
 import pandas as pd
-from auto_preprocessor.data_cleaning import remove_outliers, handle_missing_values
-from auto_preprocessor.data_cleaning import remove_duplicate_rows
+from auto_preprocessor.data_cleaning import (
+    remove_outliers,
+    handle_missing_values,
+    remove_duplicate_rows,
+    normalize_column_names,
+)
 
 def test_remove_outliers():
     data = {
@@ -28,3 +32,20 @@ def test_remove_duplicate_rows():
     df = pd.DataFrame(data)
     deduped_df = remove_duplicate_rows(df)
     assert len(deduped_df) == 2
+
+
+def test_handle_missing_values_constant():
+    data = {
+        "age": [25, None, 35],
+        "income": [50000, None, 70000],
+    }
+    df = pd.DataFrame(data)
+    filled_df = handle_missing_values(df, strategy="constant", constant_value=0)
+    assert filled_df.isnull().sum().sum() == 0
+    assert (filled_df["age"] == 0).sum() == 1
+
+
+def test_normalize_column_names():
+    df = pd.DataFrame({"First Name": ["Alice"], "Last-Name": ["Smith"]})
+    normalized = normalize_column_names(df)
+    assert set(normalized.columns) == {"first_name", "last_name"}

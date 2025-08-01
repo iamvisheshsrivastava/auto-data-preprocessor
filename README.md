@@ -29,10 +29,10 @@ Real-world data is often messy. It may include missing values, outliers, mixed d
 **auto-data-preprocessor** aims to simplify and automate these tedious, yet essential, steps for **classification** tasks. It provides an easy-to-use interface to handle:
 
 - Missing value imputation  
-- Outlier detection (planned in the next updates)  
-- Categorical encoding  
-- Numerical feature scaling  
-- Basic feature engineering (such as polynomial features or transformations - planned)  
+- Outlier detection
+- Categorical encoding
+- Numerical feature scaling (standard or min-max)
+- Basic feature engineering (PCA and polynomial features)
 
 This library is suitable for **both beginners and advanced data scientists** who want to **accelerate** their data preparation workflows.
 
@@ -40,29 +40,28 @@ This library is suitable for **both beginners and advanced data scientists** who
 
 ## 2. Key Features
 
-1. **Automatic Missing Value Handling**  
-   - Identifies missing values in numerical and categorical columns.  
-   - Default imputation strategies (mean for numerical, most frequent for categorical) or **customizable** in upcoming versions.
+1. **Automatic Missing Value Handling**
+   - Identifies missing values in numerical and categorical columns.
+   - Default imputation strategies (mean/median/mode or constant fill values).
 
 2. **Categorical Encoding**
    - **Label Encoding** by default.
    - Optional **One-Hot Encoding** via `encoding_strategy="onehot"`.
 
-3. **Feature Scaling**  
-   - Uses **StandardScaler** by default (mean=0, variance=1).  
-   - Future enhancements include **MinMaxScaler**, **RobustScaler**, or **custom scalers**.
+3. **Feature Scaling**
+   - Uses **StandardScaler** by default or **MinMaxScaler** via `scaling_strategy="minmax"`.
 
 4. **Target Separation for Classification**  
    - Automatically separates the target column from the dataset, simplifying the modeling pipeline.
 
-5. **Outlier Detection (Planned)**  
-   - Will provide automated detection and handling using techniques like **IQR**, **z-score**, or **Isolation Forest**.
+5. **Outlier Detection**
+   - Detect and remove extreme values using **IQR** or **z-score** methods.
 
-6. **Basic Feature Engineering (Planned)**  
-   - Transformations like logarithmic scaling, polynomial features, and feature interactions.
+6. **Basic Feature Engineering**
+   - Includes **PCA** and generation of **polynomial features**.
 
-7. **Customization Options**  
-   - Upcoming versions will allow specifying advanced imputation methods, encoder types, and scaling techniques.
+7. **Customization Options**
+   - Flexible strategies for imputation, encoding, and scaling.
 
 8. **Ease of Use**  
    - Designed to be **beginner-friendly** yet **highly flexible** for experienced users.  
