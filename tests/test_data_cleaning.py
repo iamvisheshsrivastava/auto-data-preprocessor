@@ -20,6 +20,15 @@ def test_handle_missing_values():
     imputed_df = handle_missing_values(df, strategy="mean")
     assert imputed_df.isnull().sum().sum() == 0
 
+def test_handle_missing_values_constant():
+    data = {
+        "age": [25, None, 35],
+        "income": [50000, None, 70000]
+    }
+    df = pd.DataFrame(data)
+    imputed_df = handle_missing_values(df, strategy="constant", fill_value=-1)
+    assert (imputed_df == -1).sum().sum() == 2
+
 def test_remove_duplicate_rows():
     data = {
         "age": [25, 25, 30],
