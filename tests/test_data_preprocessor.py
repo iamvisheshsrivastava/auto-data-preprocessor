@@ -26,3 +26,16 @@ def test_preprocess_onehot_encoding():
     X, y = preprocessor.preprocess(df, target_column="purchased")
     assert "gender_Female" in X.columns
     assert "gender_Male" in X.columns
+
+
+def test_minmax_scaling():
+    data = {
+        "age": [25, 30],
+        "income": [50000, 60000],
+        "purchased": [1, 0],
+    }
+    df = pd.DataFrame(data)
+    preprocessor = DataPreprocessor(scaling_strategy="minmax")
+    X, _ = preprocessor.preprocess(df, target_column="purchased")
+    assert X["age"].min() == 0
+    assert X["age"].max() == 1
