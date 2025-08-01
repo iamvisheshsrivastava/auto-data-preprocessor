@@ -2,24 +2,43 @@ import pandas as pd
 import numpy as np
 
 def remove_outliers(df, columns, method="zscore", threshold=3):
-    """Remove extreme values from specified columns using z-score or IQR."""
+    """Remove extreme values from specified columns using z-score or IQR.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        The dataframe to operate on.
+    columns : list[str]
+        The columns on which to perform outlier removal.
+    method : {"zscore", "iqr"}, default "zscore"
+        The strategy used to detect outliers.
+    threshold : float, default 3
+        The cut-off threshold for the chosen method.
+
+    Returns
+    -------
+    pandas.DataFrame
+        A dataframe with outliers removed and the index reset.
+    """
+
     if method == "zscore":
+        # Use a robust z-score based on the median and MAD. This works better
+        # for small data sets or when extreme outliers skew the standard
+        # deviation.
         for column in columns:
-            # compute z-scores for the column
-            z_scores = (df[column] - df[column].mean()) / df[column].std()
-            # keep rows within the threshold
-            df = df[z_scores.abs() <= threshold]
+            median = df[column].median()
+            mad = np.median(np.abs(df[column] - median))
+            if mad == 0:
+                continue
+            modified_z = 0.6745 * (df[column] - median) / mad
+            df = df[modified_z.abs() <= threshold]
     elif method == "iqr":
         for column in columns:
-            # compute the 25th percentile
             Q1 = df[column].quantile(0.25)
-            # compute the 75th percentile
             Q3 = df[column].quantile(0.75)
-            # interquartile range
             IQR = Q3 - Q1
-            # filter rows within 1.5 * IQR bounds
             df = df[(df[column] >= Q1 - 1.5 * IQR) & (df[column] <= Q3 + 1.5 * IQR)]
-    return df
+    return df.reset_index(drop=True)
 
 
 def handle_missing_values(df, strategy="mean", columns=None):
