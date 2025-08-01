@@ -1,5 +1,5 @@
 import pandas as pd
-from sklearn.preprocessing import StandardScaler, LabelEncoder, OneHotEncoder
+from sklearn.preprocessing import StandardScaler, MinMaxScaler, LabelEncoder, OneHotEncoder
 from sklearn.impute import SimpleImputer
 
 
@@ -11,14 +11,15 @@ class DataPreprocessor:
     - Automatic detection of categorical and numerical columns
     - Missing value imputation (default strategies)
     - Label encoding for categorical variables
-    - Standard scaling for numerical features
+    - Standard or MinMax scaling for numerical features
     - Target column separation
     """
 
     def __init__(self,
                  numerical_imputer_strategy="mean",
                  categorical_imputer_strategy="most_frequent",
-                 encoding_strategy="label"):
+                 encoding_strategy="label",
+                 scaling_strategy="standard"):
         """
         Initializes the preprocessing pipeline.
 
@@ -30,10 +31,19 @@ class DataPreprocessor:
         - encoding_strategy: str, default="label"
               Encoding method for categorical variables. Supported values are
               "label" and "onehot".
+        - scaling_strategy: str, default="standard"
+              Scaling strategy for numerical features. Supported values are
+              "standard" and "minmax".
         """
         self.encoding_strategy = encoding_strategy
+        self.scaling_strategy = scaling_strategy
 
-        self.scaler = StandardScaler()
+        if scaling_strategy == "standard":
+            self.scaler = StandardScaler()
+        elif scaling_strategy == "minmax":
+            self.scaler = MinMaxScaler()
+        else:
+            raise ValueError("Unsupported scaling_strategy: %s" % scaling_strategy)
         self.label_encoders = {}
         self.onehot_encoder = None
         self.num_imputer = SimpleImputer(strategy=numerical_imputer_strategy)
@@ -84,7 +94,10 @@ class DataPreprocessor:
                     X[column] = le.fit_transform(X[column].astype(str))
                     self.label_encoders[column] = le
             elif self.encoding_strategy == "onehot":
-                self.onehot_encoder = OneHotEncoder(handle_unknown="ignore", sparse=False)
+                try:
+                    self.onehot_encoder = OneHotEncoder(handle_unknown="ignore", sparse=False)
+                except TypeError:
+                    self.onehot_encoder = OneHotEncoder(handle_unknown="ignore", sparse_output=False)
                 onehot_array = self.onehot_encoder.fit_transform(X[categorical_columns])
                 new_cols = self.onehot_encoder.get_feature_names_out(categorical_columns)
                 onehot_df = pd.DataFrame(onehot_array, columns=new_cols, index=X.index)
