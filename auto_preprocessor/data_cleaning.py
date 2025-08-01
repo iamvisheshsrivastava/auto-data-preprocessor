@@ -5,10 +5,12 @@ def remove_outliers(df, columns, method="zscore", threshold=3):
     """Remove extreme values from specified columns using z-score or IQR."""
     if method == "zscore":
         for column in columns:
-            # compute z-scores for the column
-            z_scores = (df[column] - df[column].mean()) / df[column].std()
-            # keep rows within the threshold
-            df = df[z_scores.abs() <= threshold]
+            col_median = df[column].median()
+            mad = np.median(np.abs(df[column] - col_median))
+            if mad == 0:
+                continue
+            modified_z = 0.6745 * (df[column] - col_median) / mad
+            df = df[modified_z.abs() <= threshold]
     elif method == "iqr":
         for column in columns:
             # compute the 25th percentile
@@ -43,3 +45,15 @@ def handle_missing_values(df, strategy="mean", columns=None):
 def remove_duplicate_rows(df):
     """Remove duplicate rows from a DataFrame and reset index."""
     return df.drop_duplicates().reset_index(drop=True)
+
+
+def normalize_column_names(df):
+    """Standardize column names by stripping spaces and converting to snake_case."""
+    df = df.copy()
+    df.columns = (
+        df.columns
+        .str.strip()
+        .str.lower()
+        .str.replace(" ", "_")
+    )
+    return df
