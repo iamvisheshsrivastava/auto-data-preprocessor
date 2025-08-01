@@ -43,3 +43,10 @@ def handle_missing_values(df, strategy="mean", columns=None):
 def remove_duplicate_rows(df):
     """Remove duplicate rows from a DataFrame and reset index."""
     return df.drop_duplicates().reset_index(drop=True)
+
+
+def drop_high_missing_columns(df, threshold=0.5):
+    """Drop columns whose fraction of missing values exceeds the threshold."""
+    missing_ratio = df.isna().mean()
+    cols_to_drop = missing_ratio[missing_ratio > threshold].index
+    return df.drop(columns=cols_to_drop)
