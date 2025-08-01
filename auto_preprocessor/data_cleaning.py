@@ -23,7 +23,11 @@ def remove_outliers(df, columns, method="zscore", threshold=3):
 
 
 def handle_missing_values(df, strategy="mean", columns=None):
-    """Fill NA values in specified columns using a strategy."""
+    """Handle NA values in specified columns using a given strategy.
+
+    Supported strategies are "mean", "median", "mode" and "drop".
+    When ``columns`` is ``None`` all columns are processed.
+    """
     if columns is None:
         columns = df.columns  # default to all columns
     if strategy == "mean":
@@ -38,8 +42,18 @@ def handle_missing_values(df, strategy="mean", columns=None):
         for column in columns:
             # fill missing values with column mode
             df[column] = df[column].fillna(df[column].mode()[0])
+    elif strategy == "drop":
+        df = df.dropna(subset=columns)
     return df
 
-def remove_duplicate_rows(df):
-    """Remove duplicate rows from a DataFrame and reset index."""
-    return df.drop_duplicates().reset_index(drop=True)
+def remove_duplicate_rows(df, subset=None):
+    """Remove duplicate rows from a DataFrame and reset index.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Input DataFrame.
+    subset : list or None
+        Optional subset of columns to consider when identifying duplicates.
+    """
+    return df.drop_duplicates(subset=subset).reset_index(drop=True)
